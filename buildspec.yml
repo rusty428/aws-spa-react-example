@@ -1,0 +1,131 @@
+# AWS CodeBuild Build Specification for Single Page Applications
+# This file defines the build process for your SPA
+# Place this file in the root of your SPA repository (not in the CDK project)
+
+version: 0.2
+
+# Build phases define the steps CodeBuild executes
+phases:
+  # Install phase - set up the build environment
+  install:
+    # Specify the runtime version for Node.js
+    # Available versions: 18, 20, 22 (check AWS CodeBuild documentation for latest)
+    # Change this to match your application's Node.js requirements
+    runtime-versions:
+      nodejs: 20
+    
+    commands:
+      # Install dependencies using npm
+      # Note: Using 'npm install' instead of 'npm ci' to avoid CodeArtifact authentication issues
+      # npm install is more flexible with registry configuration
+      - echo "Installing dependencies..."
+      - rm -rf ~/.npmrc
+      - npm config delete registry
+      - npm config set registry https://registry.npmjs.org/
+      - npm install
+      
+      # Alternative package managers (uncomment and modify as needed):
+      # - yarn install --frozen-lockfile
+      # - pnpm install --frozen-lockfile
+  
+  # Pre-build phase - run before the main build (optional)
+  # Uncomment this section if you need to run linting, type checking, or other pre-build tasks
+  # pre_build:
+  #   commands:
+  #     - echo "Running linters and type checks..."
+  #     - npm run lint
+  #     - npm run type-check
+  
+  # Build phase - compile and build your application
+  build:
+    commands:
+      - echo "Building the application..."
+      
+      # Standard build command for most SPAs
+      # This runs the 'build' script defined in your package.json
+      - npm run build
+      
+      # Alternative build commands for different frameworks:
+      # React (Create React App): npm run build
+      # React (Vite): npm run build
+      # Vue: npm run build
+      # Angular: npm run build -- --configuration production
+      # Next.js (static export): npm run build && npm run export
+      
+      # Custom build commands with environment variables:
+      # - npm run build -- --mode production
+      # - REACT_APP_API_URL=$API_URL npm run build
+      
+      # For different Node.js versions, you can specify in runtime-versions above
+      # or use nvm (if available in the build image):
+      # - nvm install 18
+      # - nvm use 18
+      # - npm run build
+  
+  # Post-build phase - run after the build completes (optional)
+  post_build:
+    commands:
+      - echo "Build completed successfully"
+      
+      # Optional: Display build output directory contents for verification
+      # - ls -la $BUILD_OUTPUT_DIR
+      
+      # Optional: Run post-build tasks
+      # - npm run post-build
+      # - echo "Running tests on built files..."
+      # - npm run test:e2e
+
+# Artifacts section - defines what files to deploy
+artifacts:
+  # Specify the build output directory
+  # For this Sample SPA, Vite outputs to 'dist' directory
+  # Common values by framework:
+  #   - React (Create React App): build
+  #   - React (Vite): dist
+  #   - Vue: dist
+  #   - Angular: dist/<project-name>
+  #   - Next.js (static export): out
+  #   - Svelte: public/build or dist
+  base-directory: dist
+  
+  # Include all files from the build output directory
+  files:
+    - '**/*'
+  
+  # Optional: Exclude specific files or patterns
+  # exclude-paths:
+  #   - '**/*.map'
+  #   - '**/*.md'
+
+# Cache configuration - speeds up builds by caching dependencies
+# This caches node_modules between builds to reduce install time
+cache:
+  paths:
+    - 'node_modules/**/*'
+    
+    # Optional: Cache additional directories
+    # - '.npm/**/*'
+    # - '.yarn/cache/**/*'
+    # - '.pnpm-store/**/*'
+
+# Optional: Environment variables
+# These can also be set in the CDK stack configuration
+# env:
+#   variables:
+#     NODE_ENV: production
+#     REACT_APP_API_URL: https://api.example.com
+#   parameter-store:
+#     API_KEY: /myapp/api-key
+#   secrets-manager:
+#     DB_PASSWORD: prod/db/password
+
+# Optional: Reports configuration for test results and code coverage
+# reports:
+#   test-results:
+#     files:
+#       - 'test-results/**/*.xml'
+#     file-format: 'JUNITXML'
+#   coverage-report:
+#     files:
+#       - 'coverage/clover.xml'
+#     file-format: 'CLOVERXML'
