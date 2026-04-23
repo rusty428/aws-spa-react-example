@@ -8,12 +8,12 @@
   "author": "Rusty Nations",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rusty428/aws-spa-react-example.git"
+    "url": "git+https://github.com/rustynations/aws-spa-react-example.git"
   },
   "bugs": {
-    "url": "https://github.com/rusty428/aws-spa-react-example/issues"
+    "url": "https://github.com/rustynations/aws-spa-react-example/issues"
   },
-  "homepage": "https://github.com/rusty428/aws-spa-react-example#readme",
+  "homepage": "https://github.com/rustynations/aws-spa-react-example#readme",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
